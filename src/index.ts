@@ -149,6 +149,10 @@ export const generate = async (options: WritableDeep<GeneratorOptions>) => {
     if (!prismaClientImportPath.startsWith('.')) {
       prismaClientImportPath = './' + prismaClientImportPath;
     }
+    // add client suffix for Prisma v7 output
+    if (prismaClientGenerator?.provider?.value === 'prisma-client') {
+      prismaClientImportPath += '/client';
+    }
   }
 
   const outputApiPropertyType = stringToBoolean(

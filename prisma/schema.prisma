@@ -1,10 +1,10 @@
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://johndoe:mypassword@localhost:5432/mydb?schema=public"
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output = "../src/@generated/prisma"
 }
 
 generator nestjsDto {
