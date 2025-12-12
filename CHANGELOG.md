@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.29.0] - 2025-12-12
+
+- dependency updates
+- support for Prisma@7 - output path for client generator is now mandatory
+
+```prisma
+// prisma@6
+generator client {
+  provider = "prisma-client-js"
+}
+
+// prisma@7
+generator client {
+provider = "prisma-client"
+output = "../src/generated/prisma"
+}
+```
+
 ## [1.28.1] - 2025-06-05
 
 ### Fixed
