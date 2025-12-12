@@ -26,7 +26,6 @@ const stringToBoolean = (
 };
 
 export const generate = async (options: WritableDeep<GeneratorOptions>) => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const output = parseEnvValue(options.generator.output!);
   if (!output) {
     throw new Error('Failed to parse output path');
