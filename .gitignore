@@ -6,3 +6,6 @@ dist
 
 # IDE settings
 .idea
+.envrc
+.gh-config
+CLAUDE.md
