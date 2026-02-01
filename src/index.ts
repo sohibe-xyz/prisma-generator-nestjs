@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import makeDir from 'make-dir';
+import { makeDirectory } from 'make-dir';
 import slash from 'slash';
 import { generatorHandler, GeneratorOptions } from '@prisma/generator-helper';
 import { WritableDeep } from 'type-fest';
@@ -285,7 +285,7 @@ export const generate = async (options: WritableDeep<GeneratorOptions>) => {
     results
       .concat(Object.values(indexCollections))
       .map(async ({ fileName, content }) => {
-        await makeDir(path.dirname(fileName));
+        await makeDirectory(path.dirname(fileName));
 
         if (applyPrettier) {
           content = await prettier.format(content, prettierConfig);

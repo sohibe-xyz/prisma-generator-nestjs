@@ -9,3 +9,4 @@ dist
 .envrc
 .gh-config
 CLAUDE.md
+.vscode
