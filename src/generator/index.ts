@@ -12,6 +12,17 @@ import { generateUpdateDto } from './generate-update-dto';
 import { generateEntity } from './generate-entity';
 import { generatePlainDto } from './generate-plain-dto';
 import { generateEnums } from './generate-enums';
+import {
+  generateEntityZodSchema,
+  generatePlainZodSchema,
+  generateCreateZodSchema,
+  generateUpdateZodSchema,
+  generateConnectZodSchema,
+} from './generate-zod-schema';
+import {
+  computeZodModelParams,
+  computeZodTypeParams,
+} from './compute-model-params/compute-zod-params';
 import { DTO_IGNORE_MODEL } from './annotations';
 import { isAnnotatedWith } from './field-classifiers';
 import { NamingStyle, Model, WriteableFileSpecs } from './types';
@@ -39,6 +50,7 @@ interface RunParam {
   generateFileTypes: string;
   wrapRelationsAsType: boolean;
   showDefaultValues: boolean;
+  generateZodSchemas: boolean;
 }
 
 export const run = ({
@@ -61,6 +73,7 @@ export const run = ({
     generateFileTypes,
     wrapRelationsAsType,
     showDefaultValues,
+    generateZodSchemas,
     ...preAndSuffixes
   } = options;
 
@@ -189,7 +202,51 @@ export const run = ({
       }),
     };
 
-    return [createDto, updateDto, plainDto];
+    const files = [createDto, updateDto, plainDto];
+
+    // Generate Zod schemas for types if enabled
+    if (generateZodSchemas) {
+      const zodTypeParams = computeZodTypeParams({
+        model,
+        allModels: filteredTypes,
+        templateHelpers,
+      });
+
+      files.push({
+        fileName: path.join(
+          model.output.dto,
+          templateHelpers.createZodSchemaFilename(model.name, true),
+        ),
+        content: generateCreateZodSchema({
+          ...zodTypeParams.create,
+          templateHelpers,
+        }),
+      });
+
+      files.push({
+        fileName: path.join(
+          model.output.dto,
+          templateHelpers.updateZodSchemaFilename(model.name, true),
+        ),
+        content: generateUpdateZodSchema({
+          ...zodTypeParams.update,
+          templateHelpers,
+        }),
+      });
+
+      files.push({
+        fileName: path.join(
+          model.output.dto,
+          templateHelpers.plainZodSchemaFilename(model.name, true),
+        ),
+        content: generatePlainZodSchema({
+          ...zodTypeParams.plain,
+          templateHelpers,
+        }),
+      });
+    }
+
+    return files;
   });
 
   const modelFiles = filteredModels.map((model) => {
@@ -267,16 +324,95 @@ export const run = ({
       }),
     };
 
+    let files: WriteableFileSpecs[];
     switch (generateFileTypes) {
       case 'all':
-        return [connectDto, createDto, updateDto, entity, plainDto];
+        files = [connectDto, createDto, updateDto, entity, plainDto];
+        break;
       case 'dto':
-        return [connectDto, createDto, updateDto, plainDto];
+        files = [connectDto, createDto, updateDto, plainDto];
+        break;
       case 'entity':
-        return [entity];
+        files = [entity];
+        break;
       default:
         throw new Error(`Unknown 'generateFileTypes' value.`);
     }
+
+    // Generate Zod schemas for models if enabled
+    if (generateZodSchemas) {
+      const zodModelParams = computeZodModelParams({
+        model,
+        allModels: [...filteredTypes, ...filteredModels],
+        templateHelpers,
+      });
+
+      // Connect schema
+      if (generateFileTypes !== 'entity') {
+        files.push({
+          fileName: path.join(
+            model.output.dto,
+            templateHelpers.connectZodSchemaFilename(model.name, true),
+          ),
+          content: generateConnectZodSchema({
+            ...zodModelParams.connect,
+            templateHelpers,
+          }),
+        });
+
+        // Create schema
+        files.push({
+          fileName: path.join(
+            model.output.dto,
+            templateHelpers.createZodSchemaFilename(model.name, true),
+          ),
+          content: generateCreateZodSchema({
+            ...zodModelParams.create,
+            templateHelpers,
+          }),
+        });
+
+        // Update schema
+        files.push({
+          fileName: path.join(
+            model.output.dto,
+            templateHelpers.updateZodSchemaFilename(model.name, true),
+          ),
+          content: generateUpdateZodSchema({
+            ...zodModelParams.update,
+            templateHelpers,
+          }),
+        });
+
+        // Plain schema
+        files.push({
+          fileName: path.join(
+            model.output.dto,
+            templateHelpers.plainZodSchemaFilename(model.name, true),
+          ),
+          content: generatePlainZodSchema({
+            ...zodModelParams.plain,
+            templateHelpers,
+          }),
+        });
+      }
+
+      // Entity schema (always generate if generateZodSchemas is true)
+      if (generateFileTypes === 'all' || generateFileTypes === 'entity') {
+        files.push({
+          fileName: path.join(
+            model.output.entity,
+            templateHelpers.entityZodSchemaFilename(model.name, true),
+          ),
+          content: generateEntityZodSchema({
+            ...zodModelParams.entity,
+            templateHelpers,
+          }),
+        });
+      }
+    }
+
+    return files;
   });
 
   return [...typeFiles, ...modelFiles, ...enumFiles].flat();

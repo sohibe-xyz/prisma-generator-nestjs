@@ -174,6 +174,11 @@ export const generate = async (options: WritableDeep<GeneratorOptions>) => {
     false,
   );
 
+  const generateZodSchemas = stringToBoolean(
+    options.generator.config.generateZodSchemas,
+    false,
+  );
+
   const results = run({
     output,
     dmmf: options.dmmf,
@@ -197,6 +202,7 @@ export const generate = async (options: WritableDeep<GeneratorOptions>) => {
     generateFileTypes: generateFileTypes as string,
     wrapRelationsAsType,
     showDefaultValues,
+    generateZodSchemas,
   });
 
   // check for deprecated annotations

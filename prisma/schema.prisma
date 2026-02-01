@@ -28,6 +28,7 @@ generator nestjsDto {
   prettier                        = "true"
   outputApiPropertyType           = "true"
   wrapRelationsAsType             = "true"
+  generateZodSchemas              = "true"
 }
 
 model Product {

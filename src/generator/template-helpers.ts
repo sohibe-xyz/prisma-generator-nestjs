@@ -181,6 +181,30 @@ export const makeHelpers = ({
   const plainDtoFilename = (name: string, withExtension = false) =>
     fileName(name, undefined, '.dto', withExtension);
 
+  // Zod schema naming helpers
+  const entityZodSchemaName = (name: string) =>
+    className(name, entityPrefix, entitySuffix) + 'Schema';
+  const connectZodSchemaName = (name: string) =>
+    className(name, connectDtoPrefix, dtoSuffix) + 'Schema';
+  const createZodSchemaName = (name: string) =>
+    className(name, createDtoPrefix, dtoSuffix) + 'Schema';
+  const updateZodSchemaName = (name: string) =>
+    className(name, updateDtoPrefix, dtoSuffix) + 'Schema';
+  const plainZodSchemaName = (name: string) =>
+    className(name, '', dtoSuffix) + 'Schema';
+
+  // Zod schema filename helpers
+  const entityZodSchemaFilename = (name: string, withExtension = false) =>
+    fileName(name, undefined, '.entity.schema', withExtension);
+  const connectZodSchemaFilename = (name: string, withExtension = false) =>
+    fileName(name, 'connect-', '.schema', withExtension);
+  const createZodSchemaFilename = (name: string, withExtension = false) =>
+    fileName(name, 'create-', '.schema', withExtension);
+  const updateZodSchemaFilename = (name: string, withExtension = false) =>
+    fileName(name, 'update-', '.schema', withExtension);
+  const plainZodSchemaFilename = (name: string, withExtension = false) =>
+    fileName(name, undefined, '.dto.schema', withExtension);
+
   const fieldType = (
     field: ParsedField,
     dtoType: 'create' | 'update' | 'plain' = 'plain',
@@ -298,6 +322,18 @@ export const makeHelpers = ({
     updateDtoFilename,
     entityFilename,
     plainDtoFilename,
+    // Zod schema naming
+    entityZodSchemaName,
+    connectZodSchemaName,
+    createZodSchemaName,
+    updateZodSchemaName,
+    plainZodSchemaName,
+    // Zod schema filenames
+    entityZodSchemaFilename,
+    connectZodSchemaFilename,
+    createZodSchemaFilename,
+    updateZodSchemaFilename,
+    plainZodSchemaFilename,
     each,
     echo,
     fieldsToDtoProps,

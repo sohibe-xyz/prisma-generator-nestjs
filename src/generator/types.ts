@@ -127,3 +127,22 @@ export interface IDecorators {
   apiHideProperty?: boolean;
   classValidators?: IClassValidator[];
 }
+
+export interface ZodSchemaParams extends DtoParams {
+  // Relations that need z.lazy() for circular references
+  lazyRelations: string[];
+}
+
+export interface ZodModelParams {
+  connect: ZodSchemaParams;
+  create: ZodSchemaParams;
+  update: ZodSchemaParams;
+  entity: ZodSchemaParams;
+  plain: ZodSchemaParams;
+}
+
+export interface ZodTypeParams {
+  create: ZodSchemaParams;
+  update: ZodSchemaParams;
+  plain: ZodSchemaParams;
+}
